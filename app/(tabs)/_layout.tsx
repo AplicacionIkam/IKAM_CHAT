@@ -3,7 +3,6 @@ import { Stack } from "expo-router";
 
 export default function Layout() {
   return (
-    <NavigationContainer>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="SplashScreen" options={{ headerShown: false }} />
@@ -12,6 +11,5 @@ export default function Layout() {
         <Stack.Screen name="RegisterScreen" options={{ headerShown: false }} />
         <Stack.Screen name="menu" options={{ headerShown: false }} />
       </Stack>
-    </NavigationContainer>
   );
 }

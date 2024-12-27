@@ -178,34 +178,34 @@ const VistaDetallesPymes = () => {
     }
   };
 
-  const extractCoordinates = async (address: string) => {
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json`,
-        {
-          params: {
-            address: address,
-            key: GOOGLE_MAPS_API_KEY,
-          },
-        }
-      );
-      // console.log(`API Response: ${JSON.stringify(response.data)}`);
-      const { results } = response.data;
-      if (results.length > 0) {
-        const { lat, lng } = results[0].geometry.location;
-        setMapRegion({
-          latitude: lat,
-          longitude: lng,
-          latitudeDelta: 0.001,
-          longitudeDelta: 0.001,
-        });
-      } else {
-        console.error("No results found");
-      }
-    } catch (error) {
-      console.error("Error obteniendo coordenadas:", error);
-    }
-  };
+  // const extractCoordinates = async (address: string) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://maps.googleapis.com/maps/api/geocode/json`,
+  //       {
+  //         params: {
+  //           address: address,
+  //           key: GOOGLE_MAPS_API_KEY,
+  //         },
+  //       }
+  //     );
+  //     // console.log(`API Response: ${JSON.stringify(response.data)}`);
+  //     const { results } = response.data;
+  //     if (results.length > 0) {
+  //       const { lat, lng } = results[0].geometry.location;
+  //       setMapRegion({
+  //         latitude: lat,
+  //         longitude: lng,
+  //         latitudeDelta: 0.001,
+  //         longitudeDelta: 0.001,
+  //       });
+  //     } else {
+  //       console.error("No results found");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error obteniendo coordenadas:", error);
+  //   }
+  // };
 
   // Método genérico para abrir cualquier URL
   const abrirEnNavegador = (url: any) => {
@@ -370,13 +370,13 @@ const VistaDetallesPymes = () => {
                     </View>
                   </View>
                 </TouchableOpacity>
-                <View style={estilos.mapContainer}>
+                {/* <View style={estilos.mapContainer}>
                   {mapRegion && (
                     <MapView style={estilos.map} region={mapRegion}>
                       <Marker coordinate={mapRegion} />
                     </MapView>
                   )}
-                </View>
+                </View> */}
                 <View style={estilos.contenedorRedes}>
                   <Text style={estilos.descripcionRedes}>
                     También contáctanos

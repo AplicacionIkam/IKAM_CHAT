@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView, 
+  Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import colorsIkam from "@/assets/estilos";
@@ -220,68 +222,75 @@ const chatNuevo = () => {
             headerTitleAlign: "center",
           }}
         />
-        <View style={estilos.chatContainer}>
-          <ScrollView ref={scrollViewRef} style={{ flex: 1 }}>
-            <View style={estilos.messagesContainer}>
-              <Text
-                style={{ fontSize: 20, textAlign: "center", marginTop: 15 }}
-              ></Text>
-              {mensajes.length > 0 ? (
-                <View>
-                  {mensajes.map((m, index) => (
-                    <View key={index}>
-                      {m.user == userData?.uid ? (
-                        <View style={estilos.containerMensajeDerecha}>
-                          <View style={estilos.messageContainerDer}>
-                            <View>
-                              <Text style={estilos.mensajeTexto}>
-                                {m.mensaje}
-                              </Text>
-                              <Text style={estilos.mensajeHora}>
-                                {formatearHora(m.timestamp)}
-                              </Text>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={90}
+           // Ajusta según el alto de tu header
+        >
+          <View style={estilos.chatContainer}>
+            <ScrollView ref={scrollViewRef} style={{ flex: 1 }}>
+              <View style={estilos.messagesContainer}>
+                <Text
+                  style={{ fontSize: 20, textAlign: "center", marginTop: 15 }}
+                ></Text>
+                {mensajes.length > 0 ? (
+                  <View>
+                    {mensajes.map((m, index) => (
+                      <View key={index}>
+                        {m.user == userData?.uid ? (
+                          <View style={estilos.containerMensajeDerecha}>
+                            <View style={estilos.messageContainerDer}>
+                              <View>
+                                <Text style={estilos.mensajeTexto}>
+                                  {m.mensaje}
+                                </Text>
+                                <Text style={estilos.mensajeHora}>
+                                  {formatearHora(m.timestamp)}
+                                </Text>
+                              </View>
                             </View>
                           </View>
-                        </View>
-                      ) : (
-                        <View style={estilos.containerMensajeIzquierda}>
-                          <View style={estilos.messageContainerIzq}>
-                            <View>
-                              <Text style={estilos.mensajeTexto}>
-                                {m.mensaje}
-                              </Text>
-                              <Text style={estilos.mensajeHora}>
-                                {formatearHora(m.timestamp)}
-                              </Text>
+                        ) : (
+                          <View style={estilos.containerMensajeIzquierda}>
+                            <View style={estilos.messageContainerIzq}>
+                              <View>
+                                <Text style={estilos.mensajeTexto}>
+                                  {m.mensaje}
+                                </Text>
+                                <Text style={estilos.mensajeHora}>
+                                  {formatearHora(m.timestamp)}
+                                </Text>
+                              </View>
                             </View>
                           </View>
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                </View>
-              ) : (
-                <View>{/* <Text>No hay mensajes todavia</Text> */}</View>
-              )}
-            </View>
-          </ScrollView>
-          <View style={estilos.inputContainer}>
-            <View style={estilos.inputRow}>
-              <TextInput
-                placeholder="Mensaje"
-                style={estilos.textInput}
-                value={mensaje}
-                onChangeText={(mensaje) => setMensaje(mensaje)}
-              />
-              <TouchableOpacity
-                style={estilos.sendButton}
-                onPress={enviarMesaje}
-              >
-                <Feather name="send" size={25} color="#737373" />
-              </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <View>{/* <Text>No hay mensajes todavia</Text> */}</View>
+                )}
+              </View>
+            </ScrollView>
+            <View style={estilos.inputContainer}>
+              <View style={estilos.inputRow}>
+                <TextInput
+                  placeholder="Mensaje"
+                  style={estilos.textInput}
+                  value={mensaje}
+                  onChangeText={(mensaje) => setMensaje(mensaje)}
+                />
+                <TouchableOpacity
+                  style={estilos.sendButton}
+                  onPress={enviarMesaje}
+                >
+                  <Feather name="send" size={25} color="#737373" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </RootSiblingParent>
   );

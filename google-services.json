@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "844394495235",
+    "firebase_url": "https://ikamultitiendas-default-rtdb.firebaseio.com",
+    "project_id": "ikamultitiendas",
+    "storage_bucket": "ikamultitiendas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844394495235:android:deda07e0d51f6ab4487d36",
+        "android_client_info": {
+          "package_name": "com.allsveam.Ikam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Sm38xUlEJRRS4cB0MKjSjCI_uzRhoE8"
+        },
+        {
+          "current_key": "AIzaSyAWcAyp731myGgjxtBdjL0_OlxNJbL9Bzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844394495235:android:7b8131f135463313487d36",
+        "android_client_info": {
+          "package_name": "com.allsveam.IkamMultitiendas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Sm38xUlEJRRS4cB0MKjSjCI_uzRhoE8"
+        },
+        {
+          "current_key": "AIzaSyAWcAyp731myGgjxtBdjL0_OlxNJbL9Bzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844394495235:android:5d6a7acc2a5015d2487d36",
+        "android_client_info": {
+          "package_name": "com.ikammultitiendas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Sm38xUlEJRRS4cB0MKjSjCI_uzRhoE8"
+        },
+        {
+          "current_key": "AIzaSyAWcAyp731myGgjxtBdjL0_OlxNJbL9Bzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:844394495235:android:34bf6cd669fe2b7d487d36",
+        "android_client_info": {
+          "package_name": "com.mycompany.ikam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-Sm38xUlEJRRS4cB0MKjSjCI_uzRhoE8"
+        },
+        {
+          "current_key": "AIzaSyAWcAyp731myGgjxtBdjL0_OlxNJbL9Bzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

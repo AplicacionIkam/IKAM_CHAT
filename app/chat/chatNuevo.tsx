@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView, 
+  Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import colorsIkam from "@/assets/estilos";
@@ -165,6 +167,12 @@ const chatNuevo = () => {
           headerTitleAlign: "center",
         }}
       />
+      <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                keyboardVerticalOffset={90}
+                 // Ajusta según el alto de tu header
+              >
       <View style={estilos.chatContainer}>
         <ScrollView>
           <View style={estilos.messagesContainer}>
@@ -224,6 +232,7 @@ const chatNuevo = () => {
           </View>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };

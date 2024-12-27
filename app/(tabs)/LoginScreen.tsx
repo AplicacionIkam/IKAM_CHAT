@@ -24,8 +24,8 @@ import { auth, ikam } from "@/firebase/config-ikam";
 import { getUserData, saveUserData } from "@/auth/authService";
 import ModalPassword from "@/components/modalPassword";
 
-import * as Notifications from "expo-notifications";
-import GetPushNotificationToken from "@/components/getToken";
+// Importa las funciones de Firebase Messaging
+import messaging from "@react-native-firebase/messaging";
 
 const Logo = require("@/assets/img/logo_ikam.png");
 
@@ -39,33 +39,33 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
-  const [permissionGranted, setPermissionGranted] = useState(false);
-  const [expoPushToken, setExpoPushToken] = useState("");
+  const [fcmToken, setFcmToken] = useState(""); // Almacena el token FCM
 
-  const handleGetToken = async (userUid) => {
-    const token = await GetPushNotificationToken();
-    if (token) {
-      setExpoPushToken(token);
-      // Alert.alert("Token generado", token);
-      await updateUserPushTokens(userUid, token); // Update Firestore with the new token
-    }
-  };
+  // Solicita permisos para notificaciones push y obtiene el token FCM
+  const requestUserPermission = async (userUid) => {
+    try {
+      const authStatus = await messaging().requestPermission();
+      const isEnabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  const askNotificationPermission = async (userUid) => {
-    let { status } = await Notifications.getPermissionsAsync();
-    if (status !== "granted") {
-      const { status: finalStatus } =
-        await Notifications.requestPermissionsAsync();
-      if (finalStatus !== "granted") {
-        Alert.alert("Permiso denegado para las notificaciones");
-        return;
+      if (isEnabled) {
+        console.log("Permisos para notificaciones concedidos.");
+        const token = await messaging().getToken();
+        setFcmToken(token);
+        console.log("Token FCM generado:", token);
+
+        // Actualiza Firestore con el token
+        await updateUserPushTokens(userUid, token);
+      } else {
+        console.log("Permisos para notificaciones denegados.");
       }
+    } catch (error) {
+      console.error("Error al solicitar permisos para notificaciones:", error);
     }
-    setPermissionGranted(true);
-    await handleGetToken(userUid);
-    // Alert.alert("Permisos otorgados para notificaciones");
   };
 
+  // Actualiza los tokens de notificación en Firestore
   const updateUserPushTokens = async (userUid, newToken) => {
     const userDocRef = doc(ikam, "users", userUid);
     const userDoc = await getDoc(userDocRef);
@@ -73,36 +73,16 @@ const LoginScreen = () => {
     if (userDoc.exists()) {
       const userData = userDoc.data();
 
-      // Verifica si el atributo 'tokens' existe o no
-      if (!userData.tokens) {
-        // Si no existe, inicializa el atributo 'tokens' como un arreglo vacío
+      if (!userData.tokens || !userData.tokens.includes(newToken)) {
         await updateDoc(userDocRef, {
-          tokens: [], // Crea el atributo 'tokens' si no existe
+          tokens: arrayUnion(newToken),
         });
-        console.log("Se ha creado el atributo 'tokens' en el documento.");
-      }
-
-      // Obtener de nuevo el documento actualizado
-      const updatedUserDoc = await getDoc(userDocRef); // Vuelve a obtener el documento actualizado
-
-      // Verifica si el documento existe antes de acceder a sus datos
-      if (updatedUserDoc.exists()) {
-        const updatedUserData = updatedUserDoc.data();
-
-        if (!updatedUserData.tokens.includes(newToken)) {
-          // Agrega el nuevo token al arreglo
-          await updateDoc(userDocRef, {
-            tokens: arrayUnion(newToken),
-          });
-          console.log("Token guardado en Firestore.");
-        } else {
-          console.log("El token ya existe en el arreglo.");
-        }
+        console.log("Token FCM guardado en Firestore.");
       } else {
-        console.log("Error: El documento actualizado no existe.");
+        console.log("El token FCM ya existe en Firestore.");
       }
     } else {
-      console.log("No se encontraron datos del usuario.");
+      console.log("No se encontraron datos del usuario en Firestore.");
     }
   };
 
@@ -122,24 +102,22 @@ const LoginScreen = () => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const combinedUserData = {
-          ...userData, // Datos del documento de Firestore
-          uid: user.uid, // Añadir el `uid` del objeto `user`
+          ...userData,
+          uid: user.uid,
         };
 
         await saveUserData(combinedUserData);
 
-        // Limpiar formulario
         setForm({
           email: "",
           password: "",
         });
         setShowPassword(false);
 
-        // Redirigir a la siguiente pantalla
         router.push({ pathname: "menu", params: { user: userData } });
 
-        // Solicitar permisos y obtener el token de notificación
-        await askNotificationPermission(user.uid);
+        // Solicita permisos y obtiene el token de notificación
+        await requestUserPermission(user.uid);
       } else {
         setErrorMessage("No se encontraron datos del usuario.");
       }
@@ -177,6 +155,19 @@ const LoginScreen = () => {
     return true;
   };
 
+  // Agregar los manejadores de mensajes
+  useEffect(() => {
+    // Manejo de mensajes en primer plano
+    const unsubscribeForeground = messaging().onMessage(async (remoteMessage) => {
+      Alert.alert("¡Nuevo mensaje FCM recibido!", JSON.stringify(remoteMessage));
+    });
+
+    // Cleanup de los manejadores cuando el componente se desmonta
+    return () => {
+      unsubscribeForeground();
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -188,6 +179,7 @@ const LoginScreen = () => {
             <ActivityIndicator size="large" color="#C61919" />
           ) : (
             <View style={styles.form}>
+              {/* Formulario de login */}
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -223,6 +215,7 @@ const LoginScreen = () => {
               {errorMessage ? (
                 <Text style={styles.error}>{errorMessage}</Text>
               ) : null}
+
               <TouchableOpacity onPress={() => setModalVisible(true)}>
                 <Text style={styles.formLink}>
                   ¿Has olvidado tu contraseña?
@@ -300,60 +293,55 @@ const styles = StyleSheet.create({
   },
   inputControl: {
     height: 50,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
+    width: "100%",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#222C57",
+    borderColor: "#ddd",
     marginBottom: 15,
+    paddingHorizontal: 15,
   },
   passwordContainer: {
+    width: "100%",
     position: "relative",
   },
   eyeIcon: {
     position: "absolute",
-    right: 10,
-    top: 13,
+    right: 15,
+    top: 12,
   },
   error: {
+    color: "#e74c3c",
+    fontSize: 14,
+    marginBottom: 10,
     textAlign: "center",
-    color: "#C61919",
-    marginVertical: 10,
   },
   formLink: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#222C57",
-    marginBottom: 20,
     textAlign: "center",
+    color: "#0000ff",
+    fontSize: 14,
+    marginBottom: 10,
   },
   btnContain: {
-    marginVertical: 10,
-    alignItems: "center",
+    marginBottom: 10,
+    width: "100%",
   },
   btn: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderWidth: 1,
-    borderRadius: 30,
     backgroundColor: "#C61919",
-    borderColor: "#222C57",
-    width: "100%",
-    alignItems: "center",
+    borderRadius: 10,
+    paddingVertical: 15,
   },
   btnText: {
-    fontSize: 15,
-    fontWeight: "900",
+    textAlign: "center",
     color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
   labelLink: {
-    marginVertical: 15,
     textAlign: "center",
-    fontSize: 16,
-    color: "blue",
+    color: "#1a73e8",
+    fontSize: 14,
+    marginTop: 15,
   },
 });
 
