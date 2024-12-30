@@ -91,8 +91,9 @@ const App = () => {
   // }, []);
   useEffect(() => {
     const unsubscribe = suscribirseAPymes((pymes) => {
+      console.log("Pymes recibidas:", pymes); // Debug
       const pymesOrdenadas = pymes.sort((a, b) =>
-        a.nombre_pyme.localeCompare(b.nombre_pyme)
+        (a.nombre_pyme || "").localeCompare(b.nombre_pyme || "")
       );
       setPymes(pymesOrdenadas);
     });
@@ -101,17 +102,11 @@ const App = () => {
   }, []);
 
   // Obtener todas las Categorias
-  // useEffect(() => {
-  //   const unsubscribe = suscribirseACategorias((categorias) => {
-  //     setCategorias(categorias);
-  //     setCategoriasF(categorias); // Guardar la lista original
-  //   });
-  //   return () => unsubscribe && unsubscribe();
-  // }, []);
   useEffect(() => {
     const unsubscribe = suscribirseACategorias((categorias) => {
+      console.log("Categorías recibidas:", categorias); // Debug
       const categoriasOrdenadas = categorias.sort((a, b) =>
-        a.nombreCat.localeCompare(b.nombreCat)
+        (a.nombreCat || "").localeCompare(b.nombreCat || "")
       );
       setCategorias(categoriasOrdenadas);
       setCategoriasF(categoriasOrdenadas);
@@ -123,27 +118,29 @@ const App = () => {
   // Obtener las subcategorias
   useEffect(() => {
     const unsubscribe = suscribirseASubCategorias((subcategorias) => {
+      console.log("Subcategorías recibidas:", subcategorias); // Debug
       const subcategoriasOrdenadas = subcategorias.sort((a, b) =>
-        a.nombre.localeCompare(b.nombre)
+        (a.nombre || "").localeCompare(b.nombre || "")
       );
       setSubCategorias(subcategoriasOrdenadas);
     });
 
-    // Limpia la suscripción cuando el componente se desmonte
     return () => unsubscribe && unsubscribe();
   }, []);
 
   // Obtener todas las Colonias
   useEffect(() => {
     const unsubscribe = suscribirseAColonias((nuevasColonias) => {
+      console.log("Colonias recibidas:", nuevasColonias); // Debug
       const coloniasOrdenadas = nuevasColonias.sort((a, b) =>
-        a.label.localeCompare(b.label)
+        (a.label || "").localeCompare(b.label || "")
       );
       setColonias((prevColonias) => [...prevColonias, ...coloniasOrdenadas]);
     });
 
-    return () => unsubscribe && unsubscribe(); // Limpieza de la suscripción al desmontar el componente
+    return () => unsubscribe && unsubscribe();
   }, []);
+
 
   // Función para filtrar las pymes por colonia seleccionada y extraer las categorías sin duplicados
   const filtrarCategoriasPorColonia = (colonia: any) => {

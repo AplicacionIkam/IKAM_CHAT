@@ -20,7 +20,7 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
-import { auth, ikam } from "@/firebase/config-ikam";
+  import { auth, ikam } from "@/firebase/config-ikam";
 import { getUserData, saveUserData } from "@/auth/authService";
 import ModalPassword from "@/components/modalPassword";
 
