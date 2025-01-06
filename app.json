@@ -23,7 +23,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.allsveam.IkamMultitiendas",
-      "versionCode": 10,
+      "versionCode": 12,
       "googleServicesFile": "./google-services.json"
     },
     "web": {

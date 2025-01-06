@@ -75,7 +75,7 @@ const Chat = () => {
   useEffect(() => {
     const unsubscribe = suscribirseAPymes((pymesData) => {
       setPymes(
-        pymesData.sort((a, b) => a.nombre_pyme.localeCompare(b.nombre_pyme))
+        pymesData.sort((a, b) => (a.nombre_pyme || "").localeCompare(b.nombre_pyme))
       );
     });
     return () => unsubscribe && unsubscribe();

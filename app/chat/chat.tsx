@@ -369,12 +369,11 @@ const estilos = StyleSheet.create({
   sendButton: {
     backgroundColor: "#e5e5e5",
     marginRight: 2,
+    marginVertical: 2,
     borderRadius: 50,
     padding: 9,
     elevation: 1,
-    position: "absolute",
-    top: 4,
-    right: 4,
+    position: "static",
   },
 });
 

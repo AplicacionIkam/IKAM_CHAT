@@ -141,7 +141,6 @@ const App = () => {
     return () => unsubscribe && unsubscribe();
   }, []);
 
-
   // Función para filtrar las pymes por colonia seleccionada y extraer las categorías sin duplicados
   const filtrarCategoriasPorColonia = (colonia: any) => {
     const pymesFiltradas = pymes.filter((pyme) => pyme.nomColonia === colonia);
@@ -177,7 +176,7 @@ const App = () => {
   useEffect(() => {
     if (busquedaPyme) {
       const pyme = pymesCol.filter((p) =>
-        p.nombre_pyme?.toLowerCase().includes(busquedaPyme.toLowerCase())
+        (p.nombre_pyme || "").toLowerCase().includes(busquedaPyme.toLowerCase())
       );
       setPymesQ(pyme);
     } else {
@@ -189,7 +188,9 @@ const App = () => {
   useEffect(() => {
     if (busquedaCategoria) {
       const cat = categoriasF.filter((c) =>
-        c.nombreCat.toLowerCase().includes(busquedaCategoria.toLowerCase())
+        (c.nombreCat || "")
+          .toLowerCase()
+          .includes(busquedaCategoria.toLowerCase())
       );
       setCategorias(cat);
     } else {
@@ -211,12 +212,14 @@ const App = () => {
 
   useEffect(() => {
     const pymesCat = pymesCol.filter((pyme) =>
-      pyme.nombreCategoria.toLowerCase().includes(categoria.toLowerCase())
+      (pyme.nombreCategoria || "")
+        .toLowerCase()
+        .includes(categoria.toLowerCase())
     );
     setPymesQ(pymesCat);
 
     const subCat = subCategorias.filter((catName) =>
-      catName.categoria.toLowerCase().includes(categoria.toLowerCase())
+      (catName.categoria || "").toLowerCase().includes(categoria.toLowerCase())
     );
     setSubCategoriasF(subCat);
   }, [categoria]);
@@ -228,8 +231,8 @@ const App = () => {
     }
     //console.log(subCategoriaBuscarPyme);
     const pymesCat = pymesCol.filter((pyme) =>
-      pyme.nombreSubcate
-        ?.toLowerCase()
+      (pyme.nombreSubcate || "")
+        .toLowerCase()
         .includes(subCategoriaBuscarPyme.toLowerCase())
     );
     setPymesQ(pymesCat);
