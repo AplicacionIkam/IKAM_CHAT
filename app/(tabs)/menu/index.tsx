@@ -91,7 +91,7 @@ const App = () => {
   // }, []);
   useEffect(() => {
     const unsubscribe = suscribirseAPymes((pymes) => {
-      console.log("Pymes recibidas:", pymes); // Debug
+      //console.log("Pymes recibidas:", pymes); // Debug
       const pymesOrdenadas = pymes.sort((a, b) =>
         (a.nombre_pyme || "").localeCompare(b.nombre_pyme || "")
       );
@@ -104,7 +104,7 @@ const App = () => {
   // Obtener todas las Categorias
   useEffect(() => {
     const unsubscribe = suscribirseACategorias((categorias) => {
-      console.log("Categorías recibidas:", categorias); // Debug
+      //console.log("Categorías recibidas:", categorias); // Debug
       const categoriasOrdenadas = categorias.sort((a, b) =>
         (a.nombreCat || "").localeCompare(b.nombreCat || "")
       );
@@ -118,7 +118,7 @@ const App = () => {
   // Obtener las subcategorias
   useEffect(() => {
     const unsubscribe = suscribirseASubCategorias((subcategorias) => {
-      console.log("Subcategorías recibidas:", subcategorias); // Debug
+      //console.log("Subcategorías recibidas:", subcategorias); // Debug
       const subcategoriasOrdenadas = subcategorias.sort((a, b) =>
         (a.nombre || "").localeCompare(b.nombre || "")
       );
@@ -131,7 +131,7 @@ const App = () => {
   // Obtener todas las Colonias
   useEffect(() => {
     const unsubscribe = suscribirseAColonias((nuevasColonias) => {
-      console.log("Colonias recibidas:", nuevasColonias); // Debug
+      //console.log("Colonias recibidas:", nuevasColonias); // Debug
       const coloniasOrdenadas = nuevasColonias.sort((a, b) =>
         (a.label || "").localeCompare(b.label || "")
       );
@@ -140,7 +140,6 @@ const App = () => {
 
     return () => unsubscribe && unsubscribe();
   }, []);
-
 
   // Función para filtrar las pymes por colonia seleccionada y extraer las categorías sin duplicados
   const filtrarCategoriasPorColonia = (colonia: any) => {
@@ -177,7 +176,7 @@ const App = () => {
   useEffect(() => {
     if (busquedaPyme) {
       const pyme = pymesCol.filter((p) =>
-        p.nombre_pyme?.toLowerCase().includes(busquedaPyme.toLowerCase())
+        (p.nombre_pyme || "").toLowerCase().includes(busquedaPyme.toLowerCase())
       );
       setPymesQ(pyme);
     } else {
@@ -189,7 +188,9 @@ const App = () => {
   useEffect(() => {
     if (busquedaCategoria) {
       const cat = categoriasF.filter((c) =>
-        c.nombreCat.toLowerCase().includes(busquedaCategoria.toLowerCase())
+        (c.nombreCat || "")
+          .toLowerCase()
+          .includes(busquedaCategoria.toLowerCase())
       );
       setCategorias(cat);
     } else {
@@ -211,12 +212,14 @@ const App = () => {
 
   useEffect(() => {
     const pymesCat = pymesCol.filter((pyme) =>
-      pyme.nombreCategoria.toLowerCase().includes(categoria.toLowerCase())
+      (pyme.nombreCategoria || "")
+        .toLowerCase()
+        .includes(categoria.toLowerCase())
     );
     setPymesQ(pymesCat);
 
     const subCat = subCategorias.filter((catName) =>
-      catName.categoria.toLowerCase().includes(categoria.toLowerCase())
+      (catName.categoria || "").toLowerCase().includes(categoria.toLowerCase())
     );
     setSubCategoriasF(subCat);
   }, [categoria]);
@@ -228,8 +231,8 @@ const App = () => {
     }
     //console.log(subCategoriaBuscarPyme);
     const pymesCat = pymesCol.filter((pyme) =>
-      pyme.nombreSubcate
-        ?.toLowerCase()
+      (pyme.nombreSubcate || "")
+        .toLowerCase()
         .includes(subCategoriaBuscarPyme.toLowerCase())
     );
     setPymesQ(pymesCat);

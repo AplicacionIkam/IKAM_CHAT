@@ -463,29 +463,6 @@ export const obtenerChatsEnTiempoReal = async (
   }
 };
 
-// export const obtenerTodosLosChats = async (userId: string): Promise<Chat[]> => {
-//   try {
-//     const chatsQuery = query(
-//       collection(ikam, "chat"),
-//       where("idUser", "==", userId)
-//     );
-//     //console.log(getDocs(chatsQuery));
-//     const querySnapshot = await getDocs(chatsQuery);
-
-//     const chats: Chat[] = querySnapshot.docs.map((doc) => ({
-//       id: doc.id,
-//       unreadCount: doc.data().unreadCount || 0, // Asegúrate de mapear el unreadCount
-//       // Agrega otras propiedades del chat que necesites
-//     }));
-
-//     //console.log("chats" + chats);
-//     return chats; // Devuelve un array de chats con el tipo correcto
-//   } catch (error) {
-//     console.error("Error al obtener los chats:", error);
-//     return []; // Devuelve un array vacío en caso de error
-//   }
-// };
-
 // Servicio para obtener el token del usuario receptor
 export const getReceptorToken = async (uid: string) => {
   try {
@@ -500,6 +477,7 @@ export const getReceptorToken = async (uid: string) => {
     // Si se encuentra coincidencia, devuelve el token
     if (matchingDoc) {
       const userData = matchingDoc.data();
+      console.log(userData)
       return userData.tokens;
     }
 
@@ -530,43 +508,6 @@ export const actualizarUnreadCount = async (
     console.error("Error al actualizar unreadCount:", error);
   }
 };
-
-// export const actualizarUnreadCount = async (
-//   chatId: string,
-//   tipo: string,
-//   newCount: number
-// ) => {
-//   try {
-//     const chatRef = doc(ikam, "chat", chatId);
-//     if (tipo === "unreadCountPyme") {
-//       if (newCount === 0) {
-//         // Si newCount es 0, reseteamos el contador
-//         await updateDoc(chatRef, {
-//           unreadCountPyme: 0,
-//         });
-//       } else {
-//         // Incrementamos en 1 si no se especifica un nuevo conteo
-//         await updateDoc(chatRef, {
-//           unreadCountPyme: increment(1),
-//         });
-//       }
-//     } else {
-//       if (newCount === 0) {
-//         // Si newCount es 0, reseteamos el contador
-//         await updateDoc(chatRef, {
-//           unreadCountUser: 0,
-//         });
-//       } else {
-//         // Incrementamos en 1 si no se especifica un nuevo conteo
-//         await updateDoc(chatRef, {
-//           unreadCountUser: increment(1),
-//         });
-//       }
-//     }
-//   } catch (error) {
-//     console.error("Error al actualizar unreadCount:", error);
-//   }
-// };
 
 export const verificarSiEsPyme = async (userUID: string) => {
   try {

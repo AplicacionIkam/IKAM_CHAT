@@ -31,34 +31,41 @@ type Mensaje = {
 };
 
 async function sendPushNotification(
-  expoPushToken: string,
+  fcmToken: string,
   title: string,
   body: string
 ) {
+  console.log(fcmToken)
   const message = {
-    to: expoPushToken,
-    sound: "default",
-    title: title,
-    body: body,
-    data: { someData: "chat message" },
+    message: {
+      token: fcmToken, // Token FCM del receptor
+      notification: {
+        title: title,
+        body: body,
+      },
+      data: { someData: "chat message" }, // Datos adicionales
+    },
   };
 
   try {
-    const response = await fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Accept-encoding": "gzip, deflate",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(message),
-    });
+    const response = await fetch(
+      "https://fcm.googleapis.com/v1/projects/ikamultitiendas/messages:send",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ya29.a0ARW5m77G8LH5aw-RXNfHYAY2uiTvj4oJ6hNJGkjXqtyDpyvnqFbszmXu9RV3XsLb3SMng6gg6JRg7sW5afY64GpxFW5tRl1EhpIQq7UXEI1GaMV-aJdCzZGTVHTfp6AwGbcddsX2Ig2vzZ4UeyqK802XcAWwbbYdnJUv3i6IaCgYKAXcSARISFQHGX2MiLkTg_RJf4YuzFmMMC0gtIw0175`, // Usar el token del servidor en la cabecera
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+      }
+    );
 
     const data = await response.json();
 
     if (response.ok) {
       return true;
     } else {
+      console.error("Error al enviar la notificación:", data);
       return false;
     }
   } catch (error) {
@@ -132,7 +139,7 @@ const chatNuevo = () => {
 
         // Enviar notificación
         const notificacionEnviada = await sendPushNotification(
-          receiverToken, // Asegúrate de pasar un array de tokens
+          receiverToken.toString(), // Asegúrate de pasar un array de tokens
           tituloNotificacion,
           cuerpoNotificacion
         );
@@ -243,11 +250,6 @@ const estilos = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#f5f5f5",
   },
-  headerImage: {
-    height: 30,
-    width: 30,
-    borderRadius: 100,
-  },
   chatContainer: {
     flex: 1,
     justifyContent: "space-between",
@@ -275,7 +277,7 @@ const estilos = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginBottom: 12,
-    marginRight: 12,
+    marginRight: 14,
   },
   messageContainerDer: {
     alignSelf: "flex-end",
@@ -295,7 +297,6 @@ const estilos = StyleSheet.create({
   },
   inputContainer: {
     padding: 8,
-    marginBottom: 10,
   },
   inputRow: {
     flexDirection: "row",
@@ -316,12 +317,11 @@ const estilos = StyleSheet.create({
   sendButton: {
     backgroundColor: "#e5e5e5",
     marginRight: 2,
+    marginVertical: 2,
     borderRadius: 50,
     padding: 9,
     elevation: 1,
-    position: "absolute",
-    top: 4,
-    right: 4,
+    position: "static",
   },
 });
 

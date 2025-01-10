@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  KeyboardAvoidingView, 
+  KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -33,44 +33,36 @@ type Mensaje = {
 
 // Función para enviar notificación push con manejo de errores
 async function sendPushNotification(
-  expoPushToken: string,
+  fcmToken: string,
   title: string,
   body: string
 ) {
-  const message = {
-    to: expoPushToken,
-    sound: "default",
+  const url = "https://dxc6q5-3000.csb.app/send-notification";
+  const notificationData = {
+    token: fcmToken,
     title: title,
     body: body,
-    data: { someData: "chat message" },
   };
 
-  //console.log(message);
-
   try {
-    const response = await fetch("https://exp.host/--/api/v2/push/send", {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        Accept: "application/json",
-        "Accept-encoding": "gzip, deflate",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(message),
+      body: JSON.stringify(notificationData),
     });
 
-    const data = await response.json();
+    const result = await response.text();
+    console.log(result);
 
-    // Verificación de estado
     if (response.ok) {
-      //console.log("Notificación enviada exitosamente:", data);
-      return true; // Notificación enviada con éxito
+      console.log("Notificación enviada correctamente");
     } else {
-      //console.error("Error al enviar la notificación:", data);
-      return false; // Error en el envío
+      console.log("Error", result.error || "No se pudo enviar la notificación");
     }
   } catch (error) {
-    console.error("Error de red o al enviar la notificación:", error);
-    return false; // Error de red o fallo en el envío
+    console.log("Error", error.message);
   }
 }
 
@@ -123,16 +115,13 @@ const chatNuevo = () => {
 
       crearChatYEscucharMensajes();
     }
-  }, [userData, item.id]); // Elimina la dependencia de mensajesCargados
+  }, [userData, item.id]);
 
-  // Obtener el token del receptor
   useEffect(() => {
-    // Evita volver a ejecutar si ya tienes el token del receptor
     if (receiverToken) return;
 
     const fetchReceiverToken = async () => {
       try {
-        // Determina el receptor en función de si el usuario actual es el cliente o la pyme
         const receptorId =
           item.idUser === user?.uid ? item.idPyme : item.idUser;
         if (receptorId) {
@@ -144,11 +133,10 @@ const chatNuevo = () => {
       }
     };
 
-    // Solo ejecuta si `user` está definido
     if (user) {
       fetchReceiverToken();
     }
-  }, [user]); // Ejecutar solo cuando `user` cambie y evitar ciclos infinitos
+  }, [user]);
 
   // Enviar mensaje y notificación push
   const enviarMesaje = async () => {
@@ -180,13 +168,11 @@ const chatNuevo = () => {
       await enviarMensaje(chatId.toString(), mensaje, userData.uid);
 
       if (receiverToken) {
-        // Preparar notificación
-        const tituloNotificacion = userData.display_name; // Usar el nombre del usuario como título
-        const cuerpoNotificacion = mensaje; // Usar el mensaje como cuerpo
+        const tituloNotificacion = (isPyme != null) ? userData.display_name : isPyme.nombre_pyme;
+        const cuerpoNotificacion = mensaje;
 
-        // Enviar notificación
         const notificacionEnviada = await sendPushNotification(
-          receiverToken, // Asegúrate de pasar un array de tokens
+          receiverToken.toString(),
           tituloNotificacion,
           cuerpoNotificacion
         );
@@ -205,8 +191,8 @@ const chatNuevo = () => {
   };
 
   const formatearHora = (timestamp: any) => {
-    const date = timestamp.toDate(); // Convertir el Timestamp a objeto Date
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // Formato de hora
+    const date = timestamp.toDate();
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -226,7 +212,6 @@ const chatNuevo = () => {
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           keyboardVerticalOffset={90}
-           // Ajusta según el alto de tu header
         >
           <View style={estilos.chatContainer}>
             <ScrollView ref={scrollViewRef} style={{ flex: 1 }}>
@@ -369,12 +354,11 @@ const estilos = StyleSheet.create({
   sendButton: {
     backgroundColor: "#e5e5e5",
     marginRight: 2,
+    marginVertical: 2,
     borderRadius: 50,
     padding: 9,
     elevation: 1,
-    position: "absolute",
-    top: 4,
-    right: 4,
+    position: "static",
   },
 });
 

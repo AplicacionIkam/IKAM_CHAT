@@ -13,16 +13,18 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Alert,
   Dimensions,
   ActivityIndicator,
+  Platform,
+  PermissionsAndroid,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
-  import { auth, ikam } from "@/firebase/config-ikam";
+import { auth, ikam } from "@/firebase/config-ikam";
 import { getUserData, saveUserData } from "@/auth/authService";
 import ModalPassword from "@/components/modalPassword";
+import Toast from "react-native-root-toast";
 
 // Importa las funciones de Firebase Messaging
 import messaging from "@react-native-firebase/messaging";
@@ -44,15 +46,40 @@ const LoginScreen = () => {
   // Solicita permisos para notificaciones push y obtiene el token FCM
   const requestUserPermission = async (userUid) => {
     try {
-      const authStatus = await messaging().requestPermission();
-      const isEnabled =
-        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      // Manejo de permisos para Android
+      if (Platform.OS === "android") {
+        const hasPermission = await PermissionsAndroid.check(
+          "android.permission.POST_NOTIFICATIONS"
+        );
 
-      if (isEnabled) {
+        if (!hasPermission) {
+          const result = await PermissionsAndroid.request(
+            "android.permission.POST_NOTIFICATIONS",
+            {
+              title: "Permiso de Notificaciones",
+              message:
+                "La aplicación necesita acceso a las notificaciones para proporcionarte actualizaciones.",
+              buttonNeutral: "Preguntar más tarde",
+              buttonNegative: "Cancelar",
+              buttonPositive: "Aceptar",
+            }
+          );
+
+          if (result !== PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("Permiso para notificaciones denegado.");
+            return;
+          }
+        }
+      }
+
+      // Manejo de permisos para FCM
+      const authStatus = await messaging().requestPermission();
+      if (
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL
+      ) {
         console.log("Permisos para notificaciones concedidos.");
         const token = await messaging().getToken();
-        setFcmToken(token);
         console.log("Token FCM generado:", token);
 
         // Actualiza Firestore con el token
@@ -85,6 +112,24 @@ const LoginScreen = () => {
       console.log("No se encontraron datos del usuario en Firestore.");
     }
   };
+
+  // Se agrega el escuchador para el refresh del token
+  useEffect(() => {
+    const unsubscribeTokenRefresh = messaging().onTokenRefresh(
+      async (newToken) => {
+        console.log("Token FCM renovado:", newToken);
+        const userUid = auth.currentUser?.uid;
+        if (userUid) {
+          await updateUserPushTokens(userUid, newToken);
+        }
+      }
+    );
+
+    // Cleanup cuando el componente se desmonta
+    return () => {
+      unsubscribeTokenRefresh();
+    };
+  }, []);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -158,9 +203,21 @@ const LoginScreen = () => {
   // Agregar los manejadores de mensajes
   useEffect(() => {
     // Manejo de mensajes en primer plano
-    const unsubscribeForeground = messaging().onMessage(async (remoteMessage) => {
-      Alert.alert("¡Nuevo mensaje FCM recibido!", JSON.stringify(remoteMessage));
-    });
+    const unsubscribeForeground = messaging().onMessage(
+      async (remoteMessage) => {
+        Toast.show(
+          `¡Nuevo mensaje recibido!\n${remoteMessage.notification?.title}: ${remoteMessage.notification?.body}`,
+          {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.TOP,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+          }
+        );
+      }
+    );
 
     // Cleanup de los manejadores cuando el componente se desmonta
     return () => {
